@@ -857,7 +857,9 @@ ttywrite(const char *s, size_t n, int may_echo)
 {
 	const char *next;
 	Arg arg = (Arg) { .i = term.scr };
-
+	
+	//moved from st.h, so it is only used in this function
+	void kscrolldown(const Arg *);	
 	kscrolldown(&arg);
 
 	if (may_echo && IS_SET(MODE_ECHO))
@@ -1069,14 +1071,12 @@ tswapscreen(void)
 	tfulldirt();
 }
 
-void
-kscrolldown(const Arg* a)
+void _scrolldownlines(int n)
 {
-	int n = a->i;
-
+	//scroll pages
 	if (n < 0)
 		n = term.row + n;
-
+	//scroll lines
 	if (n > term.scr)
 		n = term.scr;
 
@@ -1087,19 +1087,55 @@ kscrolldown(const Arg* a)
 	}
 }
 
-void
-kscrollup(const Arg* a)
+void _scrolluplines(int n)
 {
-	int n = a->i;
-
+	//scroll pages
 	if (n < 0)
 		n = term.row + n;
-
+	//else scroll lines
 	if (term.scr <= HISTSIZE-n) {
 		term.scr += n;
 		selscroll(0, n);
 		tfulldirt();
 	}
+}
+
+void scrolldownlines(const Arg* a)
+{
+	int n = a->i;
+	_scrolldownlines(n);
+}
+
+void scrolluplines(const Arg* a)
+{
+	int n = a->i;
+	_scrolluplines(n);
+}
+
+void scrolldownpages(const Arg* a)
+{
+	int n = a->i;
+	_scrolldownlines(-n);
+}
+
+void scrolluppages(const Arg* a)
+{
+	int n = a->i;
+	_scrolluplines(-n);
+}
+//NOTE: Do nut use only for 1 existing reference
+void
+kscrolldown(const Arg* a)
+{
+	int n = a->i;
+	_scrolldownlines(n);
+}
+//NOTE: Do nut use only for 1 existing reference
+void
+kscrollup(const Arg* a)
+{
+	int n = a->i;
+	_scrolluplines(n);
 }
 
 void
