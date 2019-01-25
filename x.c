@@ -693,7 +693,6 @@ xresize(int col, int row)
 
 	XFreePixmap(xw.dpy, xw.buf);
 	xw.buf = XCreatePixmap(xw.dpy, xw.win, win.w, win.h, xw.depth);
-			//DefaultDepth(xw.dpy, xw.scr));
 	XftDrawChange(xw.draw, xw.buf);
 	xclear(0, 0, win.w, win.h);
 
@@ -780,7 +779,7 @@ xsetcolorname(int x, const char *name)
 
 	return 0;
 }
-//alpha patch
+
 void
 xtermclear(int col1, int row1, int col2, int row2)
 {
@@ -1031,8 +1030,6 @@ xinit(int cols, int rows)
 	if (!(xw.dpy = XOpenDisplay(NULL)))
 		die("can't open display\n");
 	xw.scr = XDefaultScreen(xw.dpy);
-	//alpha patch
-	//xw.vis = XDefaultVisual(xw.dpy, xw.scr);
 	xw.depth = (USE_ARGB) ? 32: XDefaultDepth(xw.dpy, xw.scr);
     if (!USE_ARGB)
         xw.vis = XDefaultVisual(xw.dpy, xw.scr);
@@ -1076,8 +1073,6 @@ xinit(int cols, int rows)
 	xloadfonts(usedfont, 0);
 
 	/* colors */
-	//more alpha patch
-	//xw.cmap = XDefaultColormap(xw.dpy, xw.scr);
 	if (!USE_ARGB)
         xw.cmap = XDefaultColormap(xw.dpy, xw.scr);
     else
@@ -1104,17 +1099,12 @@ xinit(int cols, int rows)
 	if (!(opt_embed && (parent = strtol(opt_embed, NULL, 0))))
 		parent = XRootWindow(xw.dpy, xw.scr);
 	xw.win = XCreateWindow(xw.dpy, parent, xw.l, xw.t,
-			//win.w, win.h, 0, XDefaultDepth(xw.dpy, xw.scr), InputOutput,
 			win.w, win.h, 0, xw.depth, InputOutput,
 			xw.vis, CWBackPixel | CWBorderPixel | CWBitGravity
 			| CWEventMask | CWColormap, &xw.attrs);
 
 	memset(&gcvalues, 0, sizeof(gcvalues));
 	gcvalues.graphics_exposures = False;
-	/*dc.gc = XCreateGC(xw.dpy, parent, GCGraphicsExposures,
-			&gcvalues);
-	xw.buf = XCreatePixmap(xw.dpy, xw.win, win.w, win.h,
-			DefaultDepth(xw.dpy, xw.scr));*/
 	xw.buf = XCreatePixmap(xw.dpy, xw.win, win.w, win.h, xw.depth);
  	dc.gc = XCreateGC(xw.dpy, (USE_ARGB) ? xw.buf: parent,
 		GCGraphicsExposures, &gcvalues);
