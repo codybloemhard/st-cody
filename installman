@@ -1,0 +1,7 @@
+sudo mkdir -p /usr/local/bin
+sudo cp -f st /usr/local/bin
+sudo chmod 755 /usr/local/bin/st
+sudo mkdir -p /usr/local/share/man/man1
+sudo sed "s/VERSION/0.8.1/g" < st.1 > /usr/local/share/man/man1/st.1
+sudo chmod 644 /usr/local/share/man/man1/st.1
+sudo tic -sx st.info
