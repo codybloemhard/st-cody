@@ -184,12 +184,15 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_Y,           selpaste,       	{.i =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       	{.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        	{.i =  0} },
-    { ControlMask,          XK_Page_Up,     scrolluppages,      {.i = 1} },
-    { ControlMask,          XK_Page_Down,   scrolldownpages,    {.i = 1} },
-	{ ShiftMask,            XK_Page_Up,     scrolluplines,      {.i = st_cody_scrolllines} },
-    { ShiftMask,          	XK_Page_Down,   scrolldownlines,    {.i = st_cody_scrolllines} },
+	{ ControlMask,            XK_I,           scrolluplines,      {.i = st_cody_scrolllines} },
+    { ControlMask,          	XK_K,           scrolldownlines,    {.i = st_cody_scrolllines} },
+    //Ctrl I,K do not work?
+    //{ ControlMask,          XK_I,           scrolluppages,      {.i = 1} },
+    //{ ControlMask,          XK_K,           scrolldownpages,    {.i = 1} },
 	{ ShiftMask,          	XK_Up,     		scrolluplines,      {.i = st_cody_scrolllines} },
     { ShiftMask,          	XK_Down,   		scrolldownlines,    {.i = st_cody_scrolllines} },
+    { ControlMask,          XK_Up,          scrolluppages,      {.i = 1} },
+    { ControlMask,          XK_Down,        scrolldownpages,    {.i = 1} },
 };
 
 /*
