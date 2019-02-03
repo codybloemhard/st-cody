@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Monospace:pixelsize=18:antialias=true:autohint=true";
+static char *font = "Literation Mono Powerline:pixelsize=18:antialias=true:autohint=true";
 static int borderpx = 32;
 //when scrolling lines(not pages), scroll n lines up/down
 #define st_cody_scrolllines 4
@@ -187,12 +187,12 @@ static Shortcut shortcuts[] = {
 	{ ControlMask,            XK_I,           scrolluplines,      {.i = st_cody_scrolllines} },
     { ControlMask,          	XK_K,           scrolldownlines,    {.i = st_cody_scrolllines} },
     //Ctrl I,K do not work?
-    //{ ControlMask,          XK_I,           scrolluppages,      {.i = 1} },
-    //{ ControlMask,          XK_K,           scrolldownpages,    {.i = 1} },
-	{ ShiftMask,          	XK_Up,     		scrolluplines,      {.i = st_cody_scrolllines} },
-    { ShiftMask,          	XK_Down,   		scrolldownlines,    {.i = st_cody_scrolllines} },
-    { ControlMask,          XK_Up,          scrolluppages,      {.i = 1} },
-    { ControlMask,          XK_Down,        scrolldownpages,    {.i = 1} },
+    { ControlMask,          XK_Page_Up,     scrolluppages,      {.i = 1} },
+    { ControlMask,          XK_Page_Down,   scrolldownpages,    {.i = 1} },
+    { ShiftMask,            XK_Page_Up,     scrolluplines,      {.i = st_cody_scrolllines} },
+    { ShiftMask,            XK_Page_Down,   scrolldownlines,    {.i = st_cody_scrolllines} },
+    { ShiftMask,            XK_Up,          scrolluplines,      {.i = st_cody_scrolllines} },
+    { ShiftMask,            XK_Down,        scrolldownlines,    {.i = st_cody_scrolllines} },
 };
 
 /*
