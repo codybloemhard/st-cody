@@ -5,20 +5,21 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Liberation Mono:pixelsize=12:antialias=true:autohint=true";
-static int borderpx = 2;
+static char *font = "Literation Mono Powerline:pixelsize=18:antialias=true:autohint=true";
+static int borderpx = 32;
+//when scrolling lines(not pages), scroll n lines up/down
+#define st_cody_scrolllines 4
 
 /*
  * What program is execed by st depends of these precedence rules:
  * 1: program passed with -e
- * 2: scroll and/or utmp
+ * 2: utmp option
  * 3: SHELL environment variable
  * 4: value of shell in /etc/passwd
  * 5: value of shell in config.h
  */
 static char *shell = "/bin/sh";
 char *utmp = NULL;
-/* scroll program: to enable use a string like "scroll" */
 char *scroll = NULL;
 char *stty_args = "stty raw pass8 nl -echo -iexten -cstopb 38400";
 
@@ -32,7 +33,7 @@ static float chscale = 1.0;
 /*
  * word delimiter string
  *
- * More advanced example: L" `'\"()[]{}"
+ * More advanced example: " `'\"()[]{}"
  */
 wchar_t *worddelimiters = L" ";
 
@@ -45,7 +46,7 @@ int allowaltscreen = 1;
 
 /* frames per second st should at maximum draw to the screen */
 static unsigned int xfps = 120;
-static unsigned int actionfps = 30;
+static unsigned int actionfps = 60;
 
 /*
  * blinking timeout (set to 0 to disable blinking) for the terminal blinking
@@ -82,19 +83,22 @@ char *termname = "st-256color";
  *
  *	stty tabs
  */
-unsigned int tabspaces = 8;
+unsigned int tabspaces = 4;
+
+//background opacity
+unsigned int alpha = 0xbb;//9c
 
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
 	/* 8 normal colors */
-	"black",
-	"red3",
-	"green3",
-	"yellow3",
-	"blue2",
-	"magenta3",
-	"cyan3",
-	"gray90",
+	"#000000",
+	"#d53924",
+	"#78d127",
+	"#f57900",
+	"#2a42ca",
+	"#cc2cb3",
+	"#2dbdd1",
+	"#aaaaaa",
 
 	/* 8 bright colors */
 	"gray50",
@@ -109,19 +113,20 @@ static const char *colorname[] = {
 	[255] = 0,
 
 	/* more colors can be added after 255 to use with DefaultXX */
+	"#dddddd",//def font color
 	"#cccccc",
 	"#555555",
+	"#000000",
 };
-
 
 /*
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 7;
-unsigned int defaultbg = 0;
-static unsigned int defaultcs = 256;
-static unsigned int defaultrcs = 257;
+unsigned int defaultfg = 256;
+unsigned int defaultbg = 259;
+static unsigned int defaultcs = 257;
+static unsigned int defaultrcs = 258;
 
 /*
  * Default shape of cursor
@@ -130,7 +135,7 @@ static unsigned int defaultrcs = 257;
  * 6: Bar ("|")
  * 7: Snowman ("☃")
  */
-static unsigned int cursorshape = 2;
+static unsigned int cursorshape = 6;
 
 /*
  * Default columns and rows numbers
@@ -152,11 +157,6 @@ static unsigned int mousebg = 0;
  */
 static unsigned int defaultattr = 11;
 
-/*
- * Force mouse select/shortcuts while mask is active (when MODE_MOUSE is set).
- * Note that if you want to use ShiftMask with selmasks, set this to an other
- * modifier, set to 0 to not use it.
- */
 static uint forcemousemod = ShiftMask;
 
 /*
@@ -164,10 +164,9 @@ static uint forcemousemod = ShiftMask;
  * Beware that overloading Button1 will disable the selection.
  */
 static MouseShortcut mshortcuts[] = {
-	/* mask                 button   function        argument       release */
-	{ XK_ANY_MOD,           Button2, selpaste,       {.i = 0},      1 },
-	{ XK_ANY_MOD,           Button4, ttysend,        {.s = "\031"} },
-	{ XK_ANY_MOD,           Button5, ttysend,        {.s = "\005"} },
+	/* button               mask            string */
+	{ Button4,              XK_ANY_MOD,     "\031" },
+	{ Button5,              XK_ANY_MOD,     "\005" },
 };
 
 /* Internal keyboard shortcuts. */
@@ -176,18 +175,20 @@ static MouseShortcut mshortcuts[] = {
 
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
-	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
-	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
-	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
-	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
-	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
-	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
-	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
-	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
-	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
-	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
-	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+	{ XK_ANY_MOD,           XK_Break,       sendbreak,      	{.i =  0} },
+	{ ControlMask,          XK_Print,       toggleprinter,  	{.i =  0} },
+	{ ShiftMask,            XK_Print,       printscreen,    	{.i =  0} },
+	{ XK_ANY_MOD,           XK_Print,       printsel,       	{.i =  0} },
+	{ TERMMOD,              XK_Prior,       zoom,           	{.f = +1} },
+	{ TERMMOD,              XK_Next,        zoom,           	{.f = -1} },
+	{ TERMMOD,              XK_Home,        zoomreset,      	{.f =  0} },
+	{ TERMMOD,              XK_C,           clipcopy,       	{.i =  0} },
+	{ TERMMOD,              XK_V,           clippaste,      	{.i =  0} },
+	{ TERMMOD,              XK_Y,           selpaste,       	{.i =  0} },
+	{ ShiftMask,            XK_Insert,      selpaste,       	{.i =  0} },
+	{ TERMMOD,              XK_Num_Lock,    numlock,        	{.i =  0} },
+        { ShiftMask,            XK_I,           kscrollup,              {.i = -1} },
+        { ShiftMask,            XK_K,           kscrolldown,            {.i = -1} },
 };
 
 /*
@@ -205,6 +206,10 @@ static Shortcut shortcuts[] = {
  * * 0: no value
  * * > 0: cursor application mode enabled
  * * < 0: cursor application mode disabled
+ * crlf value
+ * * 0: no value
+ * * > 0: crlf mode is enabled
+ * * < 0: crlf mode is disabled
  *
  * Be careful with the order of the definitions because st searches in
  * this table sequentially, so any XK_ANY_MOD must be in the last
@@ -222,6 +227,13 @@ static KeySym mappedkeys[] = { -1 };
  * numlock (Mod2Mask) and keyboard layout (XK_SWITCH_MOD) are ignored.
  */
 static uint ignoremod = Mod2Mask|XK_SWITCH_MOD;
+
+/*
+ * Override mouse-select while mask is active (when MODE_MOUSE is set).
+ * Note that if you want to use ShiftMask with selmasks, set this to an other
+ * modifier, set to 0 to not use it.
+ */
+static uint forceselmod = ShiftMask;
 
 /*
  * This is the huge key array which defines all compatibility to the Linux
