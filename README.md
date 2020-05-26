@@ -10,5 +10,5 @@ My Suckless ST fork.
 C(Control), S(Shift)
 - C-S c = copy
 - C-S v = paste
-- S i = scroll up a page
-- S k = scroll down a page
+- C i = scroll up a page
+- C k = scroll down a page
