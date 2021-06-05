@@ -2032,6 +2032,8 @@ void keyboard_select(const Arg *dummy) {
 int
 main(int argc, char *argv[])
 {
+        int i;
+        char *colval;
 	xw.l = xw.t = 0;
 	xw.isfixed = False;
 	win.cursor = cursorshape;
@@ -2079,6 +2081,11 @@ main(int argc, char *argv[])
 	case 'v':
 		die("%s " VERSION "\n", argv0);
 		break;
+        case 'C':
+                colval = strtok(EARGF(usage()), "@");
+                i = atoi(strtok(NULL, "@"));
+                colorname[i] = colval;
+                break;
 	default:
 		usage();
 	} ARGEND;
