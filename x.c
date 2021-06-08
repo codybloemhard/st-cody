@@ -851,7 +851,7 @@ xclear(int x1, int y1, int x2, int y2)
 void
 xhints(void)
 {
-	XClassHint class = {opt_name ? opt_name : "st", opt_class ? opt_class : "St"};
+        XClassHint class = {opt_name ? opt_name : termname, opt_class ? opt_class : termname};
 	XWMHints wm = {.flags = InputHint, .input = 1};
 	XSizeHints *sizeh;
 
@@ -2072,10 +2072,11 @@ config_init(void)
     XrmDatabase db;
     ResourcePref *p;
 
-    XrmInitialize();
     Display *dpy;
     if(!(dpy = XOpenDisplay(NULL)))
         die("Can't open display\n");
+
+    XrmInitialize();
 
     resm = XResourceManagerString(dpy);
     if (!resm)
