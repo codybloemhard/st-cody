@@ -5,9 +5,17 @@ My Suckless ST fork.
 - Scrollback per page
 - Colours can be set with cli arguments
 - Colours can be set with Xresources
+- Colours can be refreshed live with `pkill -USR1 '^st$'`
 ## Patches aplied
 - st-alpha-0.8.2.diff
 - st-scrollback-20200419-72e3f6c.diff
+- st-colors-at-launch-0.8.4.diff
+- st-xresources-20200604-9ba7ecf.diff
+## Loosly based on
+- st-externalpipe-signal-0.8.2.diff
+## Bugs
+Xresources works normally and with -c flag(to set class), however it does not work with -n flag(set name).
+I don't know why but I use -c now instead of -n and changed my i3 config to have live colour refreshable scratchpad.
 ## Some Shortcuts
 ### (Meant for QGMLWY layout)
 C(Control), S(Shift)
