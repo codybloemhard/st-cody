@@ -202,6 +202,7 @@ static char *kmap(KeySym, uint);
 static int match(uint, uint);
 
 static void run(void);
+static void config_init(void);
 static void usage(void);
 
 static void (*handler[LASTEvent])(XEvent *) = {
@@ -380,8 +381,7 @@ mousesel(XEvent *e, int done)
 void
 mousereport(XEvent *e)
 {
-	int len, x = evcol(e), y = evrow(e),
-	    button = e->xbutton.button, state = e->xbutton.state;
+	int len, x = evcol(e), y = evrow(e), button = e->xbutton.button, state = e->xbutton.state;
 	char buf[40];
 	static int ox, oy;
 
@@ -1128,8 +1128,6 @@ xinit(int cols, int rows)
 	XWindowAttributes attr;
 	XVisualInfo vis;
 
-	/* if (!(xw.dpy = XOpenDisplay(NULL))) */
-	/* 	die("can't open display\n"); */
 	xw.scr = XDefaultScreen(xw.dpy);
 
 	if (!(opt_embed && (parent = strtol(opt_embed, NULL, 0)))) {
@@ -1235,6 +1233,16 @@ xinit(int cols, int rows)
 	xsel.xtarget = XInternAtom(xw.dpy, "UTF8_STRING", 0);
 	if (xsel.xtarget == None)
 		xsel.xtarget = XA_STRING;
+}
+
+void
+xrefreshcolours(void)
+{
+    config_init();
+    xloadcols();
+    cresize(win.w, win.h);
+    redraw();
+    XFlush(xw.dpy);
 }
 
 int
@@ -2027,22 +2035,22 @@ resource_load(XrmDatabase db, char *name, enum resource_type rtype, void *dst)
 	char **sdst = dst;
 	int *idst = dst;
 	float *fdst = dst;
- 
+
  	char fullname[256];
  	char fullclass[256];
  	char *type;
  	XrmValue ret;
- 
+
  	snprintf(fullname, sizeof(fullname), "%s.%s",
  			opt_name ? opt_name : "st", name);
  	snprintf(fullclass, sizeof(fullclass), "%s.%s",
  			opt_class ? opt_class : "St", name);
  	fullname[sizeof(fullname) - 1] = fullclass[sizeof(fullclass) - 1] = '\0';
- 
+
  	XrmGetResource(db, fullname, fullclass, &type, &ret);
  	if (ret.addr == NULL || strncmp("String", type, 64))
  		return 1;
- 
+
  	switch (rtype) {
  	case STRING:
  		*sdst = ret.addr;
@@ -2056,36 +2064,40 @@ resource_load(XrmDatabase db, char *name, enum resource_type rtype, void *dst)
  	}
  	return 0;
  }
- 
- void
- config_init(void)
- {
- 	char *resm;
- 	XrmDatabase db;
- 	ResourcePref *p;
- 
- 	XrmInitialize();
- 	resm = XResourceManagerString(xw.dpy);
- 	if (!resm)
- 		return;
- 
- 	db = XrmGetStringDatabase(resm);
- 	for (p = resources; p < resources + LEN(resources); p++)
- 		resource_load(db, p->name, p->type, p->dst);
- }
- 
+
+void
+config_init(void)
+{
+    char *resm;
+    XrmDatabase db;
+    ResourcePref *p;
+
+    XrmInitialize();
+    Display *dpy;
+    if(!(dpy = XOpenDisplay(NULL)))
+        die("Can't open display\n");
+
+    resm = XResourceManagerString(dpy);
+    if (!resm)
+        return;
+
+    db = XrmGetStringDatabase(resm);
+    for (p = resources; p < resources + LEN(resources); p++)
+        resource_load(db, p->name, p->type, p->dst);
+    XFlush(dpy);
+}
 
 void
 usage(void)
 {
-	die("usage: %s [-aiv] [-c class] [-f font] [-g geometry]"
-	    " [-n name] [-o file]\n"
-	    "          [-T title] [-t title] [-w windowid]"
-	    " [[-e] command [args ...]]\n"
-	    "       %s [-aiv] [-c class] [-f font] [-g geometry]"
-	    " [-n name] [-o file]\n"
-	    "          [-T title] [-t title] [-w windowid] -l line"
-	    " [stty_args ...]\n", argv0, argv0);
+        die("usage: %s [-aiv] [-c class] [-f font] [-g geometry]"
+            " [-n name] [-o file]\n"
+            "          [-T title] [-t title] [-w windowid]"
+            " [[-e] command [args ...]]\n"
+            "       %s [-aiv] [-c class] [-f font] [-g geometry]"
+            " [-n name] [-o file]\n"
+            "          [-T title] [-t title] [-w windowid] -l line"
+            " [stty_args ...]\n", argv0, argv0);
 }
 
 void toggle_winmode(int flag) {
@@ -2168,16 +2180,16 @@ run:
 	XSetLocaleModifiers("");
 
 	if(!(xw.dpy = XOpenDisplay(NULL)))
- 		die("Can't open display\n");
+            die("Can't open display\n");
 
- 	config_init();
-	cols = MAX(cols, 1);
-	rows = MAX(rows, 1);
-	tnew(cols, rows);
-	xinit(cols, rows);
-	xsetenv();
-	selinit();
-	run();
+        config_init();
+        cols = MAX(cols, 1);
+        rows = MAX(rows, 1);
+        tnew(cols, rows);
+        xinit(cols, rows);
+        xsetenv();
+        selinit();
+        run();
 
-	return 0;
+        return 0;
 }

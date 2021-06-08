@@ -165,6 +165,7 @@ typedef struct {
 static void execsh(char *, char **);
 static void stty(char **);
 static void sigchld(int);
+static void sigusr1(int);
 static void ttywriteraw(const char *, size_t);
 
 static void csidump(void);
@@ -723,6 +724,12 @@ execsh(char *cmd, char **args)
 	_exit(1);
 }
 
+void sigusr1(int unused){
+    xrefreshcolours();
+    signal(SIGUSR1, sigusr1);
+    printf("st: sigusr1 received.\n");
+}
+
 void
 sigchld(int a)
 {
@@ -769,6 +776,12 @@ stty(char **args)
 int
 ttynew(char *line, char *cmd, char *out, char **args)
 {
+        static struct sigaction sa;
+ 	sa.sa_handler = sigusr1;
+ 	sigemptyset(&sa.sa_mask);
+ 	sa.sa_flags = SA_RESTART;
+ 	sigaction(SIGUSR1, &sa, NULL);
+
 	int m, s;
 
 	if (out) {

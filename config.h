@@ -189,14 +189,9 @@ ResourcePref resources[] = {
         { "foreground",   STRING,  &colorname[DEF_FG] },
         { "selbackground",STRING,  &colorname[DEF_SEL_FG] },
         { "selforeground",STRING,  &colorname[DEF_SEL_BG] },
-        { "termname",     STRING,  &termname },
-        { "shell",        STRING,  &shell },
-        { "blinktimeout", INTEGER, &blinktimeout },
-        { "bellvolume",   INTEGER, &bellvolume },
-        { "tabspaces",    INTEGER, &tabspaces },
-        { "borderpx",     INTEGER, &borderpx },
-        { "cwscale",      FLOAT,   &cwscale },
-        { "chscale",      FLOAT,   &chscale },
+        // { "borderpx",     INTEGER, &borderpx },
+        // { "cwscale",      FLOAT,   &cwscale },
+        // { "chscale",      FLOAT,   &chscale },
 };
 
 /*
