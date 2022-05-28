@@ -817,6 +817,9 @@ xloadcols(void)
 	dc.col[defaultbg].color.alpha = (unsigned short)(0xffff * alpha);
 	dc.col[defaultbg].pixel &= 0x00FFFFFF;
 	dc.col[defaultbg].pixel |= (unsigned char)(0xff * alpha) << 24;
+        dc.col[defaultbg].color.red *= alpha;
+        dc.col[defaultbg].color.green *= alpha;
+        dc.col[defaultbg].color.blue *= alpha;
 	loaded = 1;
 }
 
@@ -1494,6 +1497,11 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
 	r.width = width;
 	XftDrawSetClipRectangles(xw.draw, winx, winy, &r, 1);
 
+        // ignore alpha in selected text
+        auto ogalpha = fg->color.alpha;
+        if (ATTR_REVERSE)
+            fg->color.alpha = 0xFFFF;
+
 	/* Render the glyphs. */
 	XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
 
@@ -1510,6 +1518,10 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
 
 	/* Reset clip to none. */
 	XftDrawSetClip(xw.draw, 0);
+
+        // reset temp alpha
+        if (ATTR_REVERSE)
+            fg->color.alpha = ogalpha;
 }
 
 void
@@ -2086,6 +2098,7 @@ config_init(void)
     for (p = resources; p < resources + LEN(resources); p++)
         resource_load(db, p->name, p->type, p->dst);
     XFlush(dpy);
+    free(dpy);
 }
 
 void

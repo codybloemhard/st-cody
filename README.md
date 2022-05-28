@@ -1,11 +1,12 @@
 # st-cody
 My Suckless ST fork.
 ## Extra Features
-- Translucent background
 - Scrollback per page
+- Translucent background with correct blending(alpha = 0 means no bg colour no matter what the bg colour is set to)
 - Colours can be set with cli arguments
 - Colours can be set with Xresources
 - Colours can be refreshed live with `pkill -USR1 '^st$'`
+- Alpha ignored in selected text (to support alpha = 0)
 ## Patches aplied
 - st-alpha-0.8.2.diff
 - st-scrollback-20200419-72e3f6c.diff
