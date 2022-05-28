@@ -2,16 +2,18 @@
 My Suckless ST fork.
 ## Extra Features
 - Scrollback per page
-- Translucent background with correct blending(alpha = 0 means no bg colour no matter what the bg colour is set to)
+- Translucent background with custom (correct?) blending(alpha = 0 means no bg colour no matter what the bg colour is set to)
+- Alpha ignored in selected text (to support alpha = 0)
 - Colours can be set with cli arguments
 - Colours can be set with Xresources
 - Colours can be refreshed live with `pkill -USR1 '^st$'`
-- Alpha ignored in selected text (to support alpha = 0)
+- Disabled Bold == Bright (Bold is Bold and Bright is Bright).
 ## Patches aplied
 - st-alpha-0.8.2.diff
 - st-scrollback-20200419-72e3f6c.diff
 - st-colors-at-launch-0.8.4.diff
 - st-xresources-20200604-9ba7ecf.diff
+- st-bold-is-not-bright-20190127-3be4cf1.diff (just quickly by hand)
 ## Loosly based on
 - st-externalpipe-signal-0.8.2.diff
 ## Bugs
